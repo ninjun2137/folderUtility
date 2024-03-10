@@ -16,16 +16,17 @@ public class folderUtil {
         while (true) {
             Scanner reader = new Scanner(System.in);
             System.out.println("JAVA FOLDER UTILITY TOOL:");
-            System.out.println("1 - Flatten COPY (Specify ROOT folder. Program will copy all files from underlying folder to ROOT folder)");
-            System.out.println("2 - Flatten CUT (Specify ROOT folder. Program will cut all files from underlying folder to ROOT folder)");
+            System.out.println("1 - Flatten COPY (Specify ROOT folder. Program will copy all files from underlying folder to specified folder)");
+            System.out.println("2 - Flatten CUT (Specify ROOT folder. Program will cut all files from underlying folder to specified folder)");
             System.out.print("SELECT: ");
             String input = reader.nextLine();
             switch (input) {
                 case "1", "2" -> {
-                    String method = input;
-                    System.out.print("Please input path: ");
-                    input = reader.nextLine();
-                    if (flatten(input, method)) {
+                    System.out.print("Please input ROOT: ");
+                    String root = reader.nextLine();
+                    System.out.print("Please input destination: ");
+                    String destination = reader.nextLine();
+                    if (flatten(root, input, destination)) {
                         System.out.println("Flattened successfully");
                     } else {
                         System.out.println("Error while flattening");
@@ -40,18 +41,18 @@ public class folderUtil {
         }
     }
 
-    public static boolean flatten(String path, String method) {
+    public static boolean flatten(String path, String method, String destination) {
         try {
             List<Path> pathList;
             try (Stream<Path> walk = Files.walk(Paths.get(path))) {
                 pathList = walk.filter(Files::isRegularFile).collect(Collectors.toList());
             }
             for (Path p : pathList) {
-                if(p.getParent().toString().equals(path)){
+                if(p.getParent().toString().equals(path) && path.equals(destination)){
                     continue;
                 }
                 if (!p.getParent().toString().equals(path))
-                    Files.copy(p.toAbsolutePath(), Paths.get(path+"/"+p.getFileName()), REPLACE_EXISTING);
+                    Files.copy(p.toAbsolutePath(), Paths.get(destination+"/"+p.getFileName()), REPLACE_EXISTING);
 
                 if(method.equals("2")){
                     if (!p.toString().equals(path) && !p.getParent().toString().equals(path))
